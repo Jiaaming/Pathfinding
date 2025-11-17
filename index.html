@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathfinding Animation - Computer Animation Project</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pathfinding Animation</h1>
+            <p class="subtitle">Algorithmic Motion Planning for Animated Agents</p>
+        </header>
+
+        <div class="main-content">
+            <div class="canvas-section">
+                <canvas id="gridCanvas"></canvas>
+
+                <!-- Performance Metrics Panel -->
+                <div class="metrics-panel">
+                    <h3>Algorithm Performance Comparison</h3>
+                    <div id="metricsComparison" class="metrics-comparison">
+                        <p class="metrics-hint">Run simulation to see performance metrics</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <!-- 1. SIMULATION CONTROLS (Front and center!) -->
+                <div class="section">
+                    <h3>🎮 Simulation Controls</h3>
+                    <div class="control-buttons">
+                        <button id="startBtn" class="control-btn primary">Start</button>
+                        <button id="pauseBtn" class="control-btn" disabled>Pause</button>
+                        <button id="resetBtn" class="control-btn">Reset</button>
+                    </div>
+                    <div class="speed-control" style="margin-top: 10px;">
+                        <label style="font-size: 0.9em;">Speed:</label>
+                        <input type="range" id="speedSlider" min="1" max="10" value="5" step="1">
+                        <span id="speedValue">5x</span>
+                    </div>
+                </div>
+
+                <!-- 2. SCENARIO SELECTION -->
+                <div class="section">
+                    <h3>📋 Load Scenario</h3>
+                    <select id="scenarioSelect" class="scenario-select">
+                        <option value="">-- Select Scenario --</option>
+                        <optgroup label="🎮 Grid Mode (6 Algorithms)">
+                            <option value="gridUltimate">🏆 All 6 Algorithms</option>
+                            <option value="gridMaze">🌀 Complex Maze</option>
+                        </optgroup>
+                        <optgroup label="🌐 NavMesh Mode (4 Algorithms + Funnel)">
+                            <option value="navmeshUrban">🏙️ Urban Environment</option>
+                            <option value="navmeshBattlefield">⚔️ Battlefield</option>
+                        </optgroup>
+                        <option value="empty">Empty Grid (Custom)</option>
+                    </select>
+                    <p id="scenarioDescription" class="scenario-desc"></p>
+                </div>
+
+                <!-- 3. MAP TYPE -->
+                <div class="section">
+                    <h3>🗺️ Map Type</h3>
+                    <div class="mode-buttons">
+                        <button id="gridMapBtn" class="mode-btn active">Grid</button>
+                        <button id="navmeshMapBtn" class="mode-btn">NavMesh</button>
+                    </div>
+                </div>
+
+                <!-- 4. AGENTS -->
+                <div class="section">
+                    <h3>🤖 Agents</h3>
+                    <div id="agentList" class="agent-list"></div>
+                    <button id="addAgentBtn" class="action-btn">+ Add Agent</button>
+                </div>
+
+                <!-- 5. EDITING MODE -->
+                <div class="section">
+                    <h3>✏️ Edit Mode</h3>
+                    <div class="mode-buttons">
+                        <button id="obstacleMode" class="mode-btn active">Add Obstacles</button>
+                        <button id="setAgentMode" class="mode-btn">Set Agent</button>
+                    </div>
+                    <button id="clearObstaclesBtn" class="control-btn" style="margin-top: 8px; width: 100%;">Clear Obstacles</button>
+                </div>
+
+                <!-- 6. STATISTICS -->
+                <div class="section">
+                    <h3>📊 Statistics</h3>
+                    <div id="stats" class="stats"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scenarios.js"></script>
+    <script src="pathfinding.js"></script>
+    <script src="navmesh.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
