@@ -766,27 +766,7 @@ class PathfindingApp {
 
         // Draw NavMesh if in NavMesh mode
         if (this.mapType === 'navmesh' && this.navmesh) {
-            // Draw NavMesh edges (connections between waypoints)
-            ctx.strokeStyle = '#3498DB';
-            ctx.lineWidth = 1;
-            ctx.globalAlpha = 0.3;
-            for (const edge of this.navmesh.edges) {
-                const wp1 = this.navmesh.waypoints[edge.from];
-                const wp2 = this.navmesh.waypoints[edge.to];
-
-                const x1 = wp1.col * this.cellSize + this.cellSize / 2;
-                const y1 = wp1.row * this.cellSize + this.cellSize / 2;
-                const x2 = wp2.col * this.cellSize + this.cellSize / 2;
-                const y2 = wp2.row * this.cellSize + this.cellSize / 2;
-
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.stroke();
-            }
-            ctx.globalAlpha = 1;
-
-            // Draw NavMesh waypoints (nodes)
+            // Draw NavMesh waypoints (green dots only, no blue lines)
             ctx.fillStyle = '#2ECC71';
             for (const wp of this.navmesh.waypoints) {
                 const x = wp.col * this.cellSize + this.cellSize / 2;
