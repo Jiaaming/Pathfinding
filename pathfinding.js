@@ -43,6 +43,7 @@ function astar(grid, start, goal, rows, cols) {
     openSet.enqueue(start, fScore.get(startKey));
 
     const visited = new Set();
+    const visitedNodes = [];
     let nodesExplored = 0;
 
     while (!openSet.isEmpty()) {
@@ -54,6 +55,7 @@ function astar(grid, start, goal, rows, cols) {
             const path = reconstructPath(cameFrom, current);
             return {
                 path,
+                exploredNodes: visitedNodes,
                 metrics: {
                     computationTime: (endTime - startTime).toFixed(3),
                     nodesExplored,
@@ -64,6 +66,7 @@ function astar(grid, start, goal, rows, cols) {
         }
 
         visited.add(currentKey);
+        visitedNodes.push(current);
         nodesExplored++;
 
         const neighbors = getNeighbors(current, grid, rows, cols);
@@ -107,6 +110,7 @@ function dijkstra(grid, start, goal, rows, cols) {
     openSet.enqueue(start, 0);
 
     const visited = new Set();
+    const visitedNodes = [];
     let nodesExplored = 0;
 
     while (!openSet.isEmpty()) {
@@ -115,6 +119,7 @@ function dijkstra(grid, start, goal, rows, cols) {
 
         if (visited.has(currentKey)) continue;
         visited.add(currentKey);
+        visitedNodes.push(current);
         nodesExplored++;
 
         if (currentKey === goalKey) {
@@ -122,6 +127,7 @@ function dijkstra(grid, start, goal, rows, cols) {
             const path = reconstructPath(cameFrom, current);
             return {
                 path,
+                exploredNodes: visitedNodes,
                 metrics: {
                     computationTime: (endTime - startTime).toFixed(3),
                     nodesExplored,
@@ -221,6 +227,7 @@ function greedyBestFirst(grid, start, goal, rows, cols) {
     const openSet = new PriorityQueue();
     const cameFrom = new Map();
     const visited = new Set();
+    const visitedNodes = [];
 
     const startKey = `${start.row},${start.col}`;
     const goalKey = `${goal.row},${goal.col}`;
@@ -234,6 +241,7 @@ function greedyBestFirst(grid, start, goal, rows, cols) {
 
         if (visited.has(currentKey)) continue;
         visited.add(currentKey);
+        visitedNodes.push(current);
         nodesExplored++;
 
         if (currentKey === goalKey) {
@@ -241,6 +249,7 @@ function greedyBestFirst(grid, start, goal, rows, cols) {
             const path = reconstructPath(cameFrom, current);
             return {
                 path,
+                exploredNodes: visitedNodes,
                 metrics: {
                     computationTime: (endTime - startTime).toFixed(3),
                     nodesExplored,
@@ -281,6 +290,7 @@ function rrt(grid, start, goal, rows, cols, maxIterations = 2000) {
     const stepSize = 2; // How far to extend toward random point
     const goalThreshold = 1.5; // How close to goal is "reached"
     let nodesExplored = 0;
+    const exploredNodes = [];
 
     for (let i = 0; i < maxIterations; i++) {
         // Sample random point (bias toward goal 10% of the time)
@@ -317,6 +327,7 @@ function rrt(grid, start, goal, rows, cols, maxIterations = 2000) {
         // Add new node to tree
         const newNode = { position: newPos, parent: nearest };
         tree.push(newNode);
+        exploredNodes.push(newPos);
         nodesExplored++;
 
         // Check if we reached the goal
@@ -333,6 +344,7 @@ function rrt(grid, start, goal, rows, cols, maxIterations = 2000) {
 
             return {
                 path: gridPath,
+                exploredNodes,
                 metrics: {
                     computationTime: (endTime - startTime).toFixed(3),
                     nodesExplored,
@@ -444,6 +456,7 @@ function jps(grid, start, goal, rows, cols) {
     openSet.enqueue(start, fScore.get(startKey));
 
     const visited = new Set();
+    const visitedNodes = [];
     let nodesExplored = 0;
 
     while (!openSet.isEmpty()) {
@@ -452,6 +465,7 @@ function jps(grid, start, goal, rows, cols) {
 
         if (visited.has(currentKey)) continue;
         visited.add(currentKey);
+        visitedNodes.push(current);
         nodesExplored++;
 
         if (currentKey === goalKey) {
@@ -459,6 +473,7 @@ function jps(grid, start, goal, rows, cols) {
             const path = reconstructPath(cameFrom, current);
             return {
                 path,
+                exploredNodes: visitedNodes,
                 metrics: {
                     computationTime: (endTime - startTime).toFixed(3),
                     nodesExplored,
@@ -593,6 +608,7 @@ function thetaStar(grid, start, goal, rows, cols) {
     // Don't set cameFrom for start - it has no parent
 
     const visited = new Set();
+    const visitedNodes = [];
     let nodesExplored = 0;
 
     while (!openSet.isEmpty()) {
@@ -601,6 +617,7 @@ function thetaStar(grid, start, goal, rows, cols) {
 
         if (visited.has(currentKey)) continue;
         visited.add(currentKey);
+        visitedNodes.push(current);
         nodesExplored++;
 
         if (currentKey === goalKey) {
@@ -608,6 +625,7 @@ function thetaStar(grid, start, goal, rows, cols) {
             const path = reconstructPath(cameFrom, current);
             return {
                 path,
+                exploredNodes: visitedNodes,
                 metrics: {
                     computationTime: (endTime - startTime).toFixed(3),
                     nodesExplored,

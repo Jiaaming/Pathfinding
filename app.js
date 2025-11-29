@@ -337,6 +337,9 @@ class PathfindingApp {
             status: 'Not configured',
             completed: false,
             metrics: null,
+            exploredNodes: [],
+            exploredVisibleCount: 0,
+            revealPerStep: 1,
             // Animation properties
             interpolation: 0 // 0 to 1, progress between current and next cell
         };
@@ -463,53 +466,37 @@ class PathfindingApp {
             // Calculate path using selected algorithm
             let result;
 
-            // Use NavMesh pathfinding if in NavMesh mode
             if (this.mapType === 'navmesh') {
-                if (!this.navmesh) {
-                    this.navmesh = generateNavMesh(this.grid, this.rows, this.cols, this.cellSize);
-                }
-
-                // Route to appropriate NavMesh algorithm
-                if (agent.algorithm === 'astar') {
-                    result = navmeshAStar(this.navmesh, agent.start, agent.goal, this.grid);
-                } else if (agent.algorithm === 'dijkstra') {
-                    result = navmeshDijkstra(this.navmesh, agent.start, agent.goal, this.grid);
-                } else if (agent.algorithm === 'greedy') {
-                    result = navmeshGreedy(this.navmesh, agent.start, agent.goal, this.grid);
-                } else if (agent.algorithm === 'rrt') {
-                    result = navmeshRRT(this.navmesh, agent.start, agent.goal, this.grid);
-                } else if (agent.algorithm === 'jps') {
-                    // JPS doesn't work on NavMesh - use A* instead
-                    result = navmeshAStar(this.navmesh, agent.start, agent.goal, this.grid);
-                } else if (agent.algorithm === 'theta') {
-                    // Theta* uses A* on NavMesh (waypoints already provide optimal angles)
-                    result = navmeshAStar(this.navmesh, agent.start, agent.goal, this.grid);
-                }
+                const { result: navResult, navmesh } = AlgorithmRunner.runNavmesh(
+                    agent,
+                    this.grid,
+                    this.navmesh,
+                    this.rows,
+                    this.cols,
+                    this.cellSize
+                );
+                this.navmesh = navmesh;
+                result = navResult;
             } else {
-                // Grid-based pathfinding
-                if (agent.algorithm === 'astar') {
-                    result = astar(this.grid, agent.start, agent.goal, this.rows, this.cols);
-                } else if (agent.algorithm === 'dijkstra') {
-                    result = dijkstra(this.grid, agent.start, agent.goal, this.rows, this.cols);
-                } else if (agent.algorithm === 'greedy') {
-                    result = greedyBestFirst(this.grid, agent.start, agent.goal, this.rows, this.cols);
-                } else if (agent.algorithm === 'rrt') {
-                    result = rrt(this.grid, agent.start, agent.goal, this.rows, this.cols);
-                } else if (agent.algorithm === 'jps') {
-                    result = jps(this.grid, agent.start, agent.goal, this.rows, this.cols);
-                } else if (agent.algorithm === 'theta') {
-                    result = thetaStar(this.grid, agent.start, agent.goal, this.rows, this.cols);
-                }
+                result = AlgorithmRunner.runGrid(agent, this.grid, this.rows, this.cols);
             }
 
             if (!result) {
                 alert(`No path found for Agent ${agent.id}!`);
                 agent.status = 'No path found';
                 agent.metrics = null;
+                agent.exploredNodes = [];
+                agent.exploredVisibleCount = 0;
+                agent.revealPerStep = 1;
                 allReady = false;
             } else {
                 agent.path = result.path;
                 agent.metrics = result.metrics;
+                agent.exploredNodes = result.exploredNodes || [];
+                agent.exploredVisibleCount = 0;
+                const stepCount = Math.max(1, (agent.path?.length || 1) - 1);
+                const totalExplored = agent.exploredNodes.length;
+                agent.revealPerStep = totalExplored > 0 ? Math.max(1, Math.ceil(totalExplored / stepCount)) : 0;
                 agent.pathIndex = 0;
                 agent.currentPos = { ...agent.start };
                 agent.completed = false;
@@ -554,6 +541,9 @@ class PathfindingApp {
                 agent.completed = false;
                 agent.interpolation = 0;
                 agent.status = agent.goal ? 'Goal set - Ready' : 'Start set';
+                agent.exploredNodes = [];
+                agent.exploredVisibleCount = 0;
+                agent.revealPerStep = 1;
             }
         }
 
@@ -600,10 +590,17 @@ class PathfindingApp {
                 if (agent.interpolation >= 1.0) {
                     agent.interpolation = 0;
                     agent.pathIndex++;
+                    if (agent.exploredVisibleCount < agent.exploredNodes.length && agent.revealPerStep > 0) {
+                        agent.exploredVisibleCount = Math.min(
+                            agent.exploredNodes.length,
+                            agent.exploredVisibleCount + agent.revealPerStep
+                        );
+                    }
 
                     if (agent.pathIndex >= agent.path.length - 1) {
                         agent.completed = true;
                         agent.interpolation = 1.0;
+                        agent.exploredVisibleCount = agent.exploredNodes.length;
                         agent.status = 'Completed!';
                     }
                 }
@@ -629,9 +626,16 @@ class PathfindingApp {
 
                         if (agent.pathIndex < agent.path.length) {
                             agent.currentPos = { ...agent.path[agent.pathIndex] };
+                            if (agent.exploredVisibleCount < agent.exploredNodes.length && agent.revealPerStep > 0) {
+                                agent.exploredVisibleCount = Math.min(
+                                    agent.exploredNodes.length,
+                                    agent.exploredVisibleCount + agent.revealPerStep
+                                );
+                            }
                             allCompleted = false;
                         } else {
                             agent.completed = true;
+                            agent.exploredVisibleCount = agent.exploredNodes.length;
                             agent.status = 'Completed!';
                         }
                     }
@@ -793,6 +797,40 @@ class PathfindingApp {
             }
         }
 
+        // Draw explored/expanded nodes using lighter agent color
+        for (const agent of this.agents) {
+            if (!agent.exploredNodes || agent.exploredNodes.length === 0) continue;
+
+            const visible = agent.exploredVisibleCount || 0;
+            if (visible === 0) continue;
+
+            const lightColor = this.lightenColor(agent.color, 0.6);
+            ctx.fillStyle = lightColor;
+            ctx.globalAlpha = 0.35;
+
+            if (this.mapType === 'navmesh') {
+                // Draw small circles at explored waypoint positions
+                for (let i = 0; i < visible; i++) {
+                    const node = agent.exploredNodes[i];
+                    const x = node.col * this.cellSize + this.cellSize / 2;
+                    const y = node.row * this.cellSize + this.cellSize / 2;
+                    ctx.beginPath();
+                    ctx.arc(x, y, this.cellSize * 0.25, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else {
+                // Grid cells: fill explored squares
+                for (let i = 0; i < visible; i++) {
+                    const node = agent.exploredNodes[i];
+                    const x = node.col * this.cellSize;
+                    const y = node.row * this.cellSize;
+                    ctx.fillRect(x, y, this.cellSize, this.cellSize);
+                }
+            }
+
+            ctx.globalAlpha = 1;
+        }
+
         // Draw agent paths
         for (const agent of this.agents) {
             if (agent.path) {
@@ -905,6 +943,23 @@ class PathfindingApp {
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 2;
         ctx.stroke();
+    }
+
+    lightenColor(hex, factor = 0.5) {
+        // Mix hex color with white by factor (0-1)
+        const normalized = hex.replace('#', '');
+        const num = parseInt(normalized, 16);
+        const r = (num >> 16) & 255;
+        const g = (num >> 8) & 255;
+        const b = num & 255;
+
+        const mix = (channel) => Math.round(channel + (255 - channel) * factor);
+        const lr = mix(r);
+        const lg = mix(g);
+        const lb = mix(b);
+
+        const toHex = (v) => v.toString(16).padStart(2, '0');
+        return `#${toHex(lr)}${toHex(lg)}${toHex(lb)}`;
     }
 }
 

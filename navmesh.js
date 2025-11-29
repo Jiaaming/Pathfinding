@@ -165,6 +165,7 @@ function navmeshAStar(navmesh, start, goal, grid) {
     openSet.enqueue(startId, h);
 
     const visited = new Set();
+    const visitedNodes = [];
     let nodesExplored = 0;
 
     while (!openSet.isEmpty()) {
@@ -172,6 +173,7 @@ function navmeshAStar(navmesh, start, goal, grid) {
 
         if (visited.has(currentId)) continue;
         visited.add(currentId);
+        visitedNodes.push(navmesh.waypoints[currentId]);
         nodesExplored++;
 
         if (currentId === goalId) {
@@ -188,6 +190,7 @@ function navmeshAStar(navmesh, start, goal, grid) {
             const endTime = performance.now();
             return {
                 path: smoothPath,
+                exploredNodes: visitedNodes,
                 metrics: {
                     computationTime: (endTime - startTime).toFixed(3),
                     nodesExplored,
@@ -319,6 +322,7 @@ function navmeshDijkstra(navmesh, start, goal, grid) {
     openSet.enqueue(startId, 0);
 
     const visited = new Set();
+    const visitedNodes = [];
     let nodesExplored = 0;
 
     while (!openSet.isEmpty()) {
@@ -326,10 +330,11 @@ function navmeshDijkstra(navmesh, start, goal, grid) {
 
         if (visited.has(currentId)) continue;
         visited.add(currentId);
+        visitedNodes.push(navmesh.waypoints[currentId]);
         nodesExplored++;
 
         if (currentId === goalId) {
-            return buildNavMeshResult(cameFrom, currentId, navmesh, start, goal, grid, startTime, nodesExplored);
+            return buildNavMeshResult(cameFrom, currentId, navmesh, start, goal, grid, startTime, nodesExplored, visitedNodes);
         }
 
         const neighbors = adjacency.get(currentId) || [];
@@ -372,6 +377,7 @@ function navmeshGreedy(navmesh, start, goal, grid) {
     openSet.enqueue(startId, h);
 
     const visited = new Set();
+    const visitedNodes = [];
     let nodesExplored = 0;
 
     while (!openSet.isEmpty()) {
@@ -379,10 +385,11 @@ function navmeshGreedy(navmesh, start, goal, grid) {
 
         if (visited.has(currentId)) continue;
         visited.add(currentId);
+        visitedNodes.push(navmesh.waypoints[currentId]);
         nodesExplored++;
 
         if (currentId === goalId) {
-            return buildNavMeshResult(cameFrom, currentId, navmesh, start, goal, grid, startTime, nodesExplored);
+            return buildNavMeshResult(cameFrom, currentId, navmesh, start, goal, grid, startTime, nodesExplored, visitedNodes);
         }
 
         const neighbors = adjacency.get(currentId) || [];
@@ -409,6 +416,7 @@ function navmeshRRT(navmesh, start, goal, grid, maxIterations = 1000) {
     const tree = [{ position: start, parent: null }];
     const goalThreshold = 3.0;
     let nodesExplored = 0;
+    const exploredNodes = [];
 
     for (let i = 0; i < maxIterations; i++) {
         // Sample random waypoint or goal
@@ -457,6 +465,7 @@ function navmeshRRT(navmesh, start, goal, grid, maxIterations = 1000) {
         // Add new node
         const newNode = { position: newPos, parent: nearest };
         tree.push(newNode);
+        exploredNodes.push(newPos);
         nodesExplored++;
 
         // Check if reached goal
@@ -468,6 +477,7 @@ function navmeshRRT(navmesh, start, goal, grid, maxIterations = 1000) {
             const endTime = performance.now();
             return {
                 path: smoothPath,
+                exploredNodes,
                 metrics: {
                     computationTime: (endTime - startTime).toFixed(3),
                     nodesExplored,
@@ -498,7 +508,7 @@ function buildAdjacencyList(navmesh) {
     return adjacency;
 }
 
-function buildNavMeshResult(cameFrom, goalId, navmesh, start, goal, grid, startTime, nodesExplored) {
+function buildNavMeshResult(cameFrom, goalId, navmesh, start, goal, grid, startTime, nodesExplored, visitedNodes = []) {
     const waypointPath = reconstructWaypointPath(cameFrom, goalId, navmesh.waypoints);
     waypointPath.unshift(start);
     waypointPath.push(goal);
@@ -510,6 +520,7 @@ function buildNavMeshResult(cameFrom, goalId, navmesh, start, goal, grid, startT
     const endTime = performance.now();
     return {
         path: smoothPath,
+        exploredNodes: visitedNodes,
         metrics: {
             computationTime: (endTime - startTime).toFixed(3),
             nodesExplored,

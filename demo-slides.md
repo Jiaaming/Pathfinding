@@ -10,9 +10,12 @@ description: CMPT766 Project
 Jiaming Liu 301626723  
 ### **TL;DR:** I built a small 2D web demo that lets you see how different pathfinding algorithms generate character motion
 
+\
+Try it at https://766.jiamingliu.com/ (PC recommended)  
 
-- Try it at https://766.jiamingliu.com/ (PC recommended)  
+---
 
+![Gemini_Generated_Image_2i6vxi2i6vxi2i6v](https://raw.githubusercontent.com/Jiaaming/blogImage/main/pic/Gemini_Generated_Image_2i6vxi2i6vxi2i6v.png)
 
 ---
 
@@ -23,7 +26,7 @@ Jiaming Liu 301626723
 <table>
 <tr>
 <td><img src="https://raw.githubusercontent.com/Jiaaming/blogImage/main/pic/20251119102244.png" width="250"></td>
-<td><img src="https://raw.githubusercontent.com/Jiaaming/blogImage/main/pic/20251119101744.png" width="350"></td>
+<td><img src="https://raw.githubusercontent.com/Jiaaming/blogImage/main/pic/20251119101744.png" width="450"></td>
 </tr>
 </table>
 
@@ -52,34 +55,30 @@ Jiaming Liu 301626723
 
 * **Efficient Geometry**: Replaces dense grids with simple polygons. Fewer nodes, faster calculation.
 
-* **Fluid Movement**: Enables natural, **any-angle motion** (Standard in *LoL*, *Overwatch*).
+* **Fluid Movement**: Enables natural, **any-angle motion** (Standard in *LOL*, *Overwatch*).
 
 <table>
 <tr>
 <td><img src="https://raw.githubusercontent.com/Jiaaming/blogImage/main/pic/20251122152707.png" width="420"></td>
-<td><img src="https://raw.githubusercontent.com/Jiaaming/blogImage/main/pic/20251119102812.png" width="420"></td>
+<td><img src="https://raw.githubusercontent.com/Jiaaming/blogImage/main/pic/Gemini_Generated_Image_q21q40q21q40q21q.png" width="500"></td>
 </tr>
 </table>
 
-* **Blue Edges**: The walkable mesh boundaries | 
+* **Blue Edges**: The walkable mesh boundaries 
+*  
 ---
 
 ## Algorithms Included
 
-- **A\*** – goal-directed shortest path (StarCraft II, Civilization)  
-- **Dijkstra** – uniform exploration baseline  
-- **Greedy Best-First** – quick but not always optimal  
-- **Jump Point Search** – grid optimization common in MMO server AI  
+- **Dijkstra** – Only actual cost, always optimal but slow
+- **Greedy Best-First** – Only estimated cost, quick but not always optimal  
+- **A\*** – actual cost + estimated cost (StarCraft II, Civilization)  
+- **Jump Point Search** – grid optimization verison of A\* 
 - **Theta\*** – any-angle grid paths  
-- **RRT** – sampling-based, popular in robotics demos  
+- **RRT** – sampling-based, popular in robotics demos but not common in industry  
 
 ---
 
-## Comparing Them
+## Compare different algorithms
+<img src="https://raw.githubusercontent.com/Jiaaming/blogImage/main/pic/20251122154409.png" width="1000">
 
-- UI shows computation time, nodes explored, and path length per agent  
-- A\* and JPS touch fewer nodes than Dijkstra on maze-like scenes  
-- Theta\* shortens the visual distance; RRT excels in tricky layouts  
-- Metrics sit next to each agent, so audiences can read them in seconds
-
----
