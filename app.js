@@ -400,7 +400,7 @@ class PathfindingApp {
                 // Grid mode: All algorithms available
                 algorithmOptions = `
                     <option value="astar" ${agent.algorithm === 'astar' ? 'selected' : ''}>A* Search</option>
-                    <option value="jps" ${agent.algorithm === 'jps' ? 'selected' : ''}>JPS (10-40x faster!)</option>
+                    <option value="jps" ${agent.algorithm === 'jps' ? 'selected' : ''}>JPS </option>
                     <option value="theta" ${agent.algorithm === 'theta' ? 'selected' : ''}>Theta* (Any-angle)</option>
                     <option value="dijkstra" ${agent.algorithm === 'dijkstra' ? 'selected' : ''}>Dijkstra</option>
                     <option value="greedy" ${agent.algorithm === 'greedy' ? 'selected' : ''}>Greedy Best-First</option>
@@ -746,7 +746,7 @@ class PathfindingApp {
                         ctx.fillStyle = '#2C3E50';
                         ctx.fillRect(x, y, this.cellSize, this.cellSize);
                     } else {
-                        ctx.fillStyle = '#ECF0F1';
+                        ctx.fillStyle = '#FFFFFF'; // white background for walkable cells
                         ctx.fillRect(x, y, this.cellSize, this.cellSize);
                     }
 

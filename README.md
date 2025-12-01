@@ -19,5 +19,3 @@ python -m http.server 8000
 ```
 Pick a scenario (Complex Maze is a good intro), press Start, and watch the colored agents move.
 
-### Why It Matters
-The project links algorithmic path planning with animation practice: users sketch obstacles, choose algorithms, and the app animates the result. It is a quick classroom demo for behavioral animation and navmesh concepts.

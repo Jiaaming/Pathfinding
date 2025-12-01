@@ -5,10 +5,10 @@ title: Pathfinding Animation Demo
 description: CMPT766 Project
 ---
 
-# Pathfinding Animation
+# Algorithmic Motion Planning
 
 Jiaming Liu 301626723  
-### **TL;DR:** I built a small 2D web demo that lets you see how different pathfinding algorithms generate character motion
+### **TL;DR:** I built a 2D web demo that lets you see how different pathfinding algorithms generate character motion
 
 \
 Try it at https://766.jiamingliu.com/ (PC recommended)  
@@ -59,13 +59,12 @@ Try it at https://766.jiamingliu.com/ (PC recommended)
 
 <table>
 <tr>
-<td><img src="https://raw.githubusercontent.com/Jiaaming/blogImage/main/pic/20251122152707.png" width="420"></td>
+<td><img src="https://raw.githubusercontent.com/Jiaaming/blogImage/main/pic/20251128232459.png" width="420"></td>
 <td><img src="https://raw.githubusercontent.com/Jiaaming/blogImage/main/pic/Gemini_Generated_Image_q21q40q21q40q21q.png" width="500"></td>
 </tr>
 </table>
 
-* **Blue Edges**: The walkable mesh boundaries 
-*  
+  
 ---
 
 ## Algorithms Included
